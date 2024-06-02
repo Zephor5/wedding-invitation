@@ -1,8 +1,8 @@
 /*
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2021-12-14 16:14:27
  * @LastEditTime: 2022-01-05 17:46:23
- * @LastEditors: zouyaoji
+ * @LastEditors: zephor5
  * @Description:
  * @FilePath: \vue-cesium-demo\.prettierrc.js
  */

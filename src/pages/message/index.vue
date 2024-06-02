@@ -1,8 +1,8 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:29:22
- * @LastEditTime: 2023-08-22 15:51:01
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditTime: 2024-06-02 17:23:12
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation-me\src\pages\message\index.vue
 -->
@@ -20,7 +20,7 @@
                 src="../../static/images/close.png"
                 class="delete_icon"
                 @click="deleteMessage(item)"
-                v-if="item.openid === openId || isAdmin"
+                v-if="item._openid === openId || isAdmin"
               />
             </div>
             <span class="top-l">{{ item.name }}</span>
@@ -42,7 +42,7 @@
         <button class="right" @tap="cancel">取消</button>
       </div>
     </div>
-    <div class="video-dialog" @tap="toVideo" v-if="url !== '' && url !== undefined && url !== null">
+    <div class="video-dialog" @tap="toVideo" v-if="url">
       <image src="../../static/images/video1.png" />
     </div>
     <div class="form-dialog" @tap="lookList">
@@ -73,12 +73,7 @@
             <view class="title">头像</view>
 
             <button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
-              <view
-                class="cu-avatar round lg"
-                :style="{
-                  'background-image': `url(${avatarUrl})`
-                }"
-              ></view>
+              <image class="cu-avatar round lg" :src="avatarUrl" />
             </button>
           </view>
           <view class="cu-form-group margin-top">
@@ -98,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, getCurrentInstance } from 'vue'
+import { onMounted, ref, computed, getCurrentInstance, nextTick, watch } from 'vue'
 import HVideo from '@src/component/video.vue'
 import HForm from '@src/component/form.vue'
 import HFormlist from '@src/component/formlist.vue'
@@ -108,22 +103,18 @@ import UniTag from '@src/component/uni-tag.vue'
 import {
   addMessage,
   addOrUpdateUser,
-  code2Session,
   getAllMessageList,
   getCommonConfig,
   getPresentList,
   getUserByOpenId,
   uploadAvatar,
-  deleteMessage as deleteMessageApi,
-  addOrUpdatePresent
+  deleteMessage as deleteMessageApi
 } from '@src/api/wedding-invitation'
 import { onShow } from '@dcloudio/uni-app'
 
 const isOpen = ref(false)
 const desc = ref('')
 const messageList = ref([])
-const openId = ref('')
-const userInfo = ref(null)
 const isForm = ref(false)
 const isVideo = ref(false)
 const isFormlist = ref(false)
@@ -138,18 +129,50 @@ const formRef = ref(null)
 const modalName = ref(null)
 const instance = getCurrentInstance()
 const globalData: GlobalData = instance.appContext.config.globalProperties.globalData
-openId.value = instance.appContext.config.globalProperties.$MpUserData?.openId
+
+const openId = ref(globalData.openid)
+const userInfo = ref(globalData.userInfo)
 
 const isAdmin = computed(() => {
   return adminsIds.value.indexOf(openId.value) !== -1
 })
 
-const avatarUrl = ref(
-  'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
+const avatarUrl = ref('cloud://wedding-3g05k4yzd513e5bb.7765-wedding-3g05k4yzd513e5bb-1258796497/avatar.svg')
+
+watch(
+  () => openId.value,
+  v => {
+    if (v) {
+      globalData.openid = v
+    }
+  }
 )
 
-onShow(() => {
-  openId.value = instance.appContext.config.globalProperties.$MpUserData?.openId
+watch(
+  () => userInfo.value,
+  v => {
+    if (v) {
+      globalData.userInfo = v
+    }
+  }
+)
+
+onShow(async () => {
+  console.log('onShow:', openId.value)
+  if (!openId.value) {
+    const userRes = await wx.cloud.callFunction({
+      name: 'user',
+      data: {}
+    })
+    console.log('userRes:', userRes)
+    openId.value = (userRes.result as AnyObject).openid
+  }
+
+  console.log('onShow:', openId.value, userInfo.value)
+
+  nextTick(() => {
+    console.log('onShow tick:', globalData.openid)
+  })
 
   getVideoUrl()
   isVideo.value = false
@@ -157,14 +180,6 @@ onShow(() => {
   isFormlist.value = false
   getMessageList()
 })
-
-// onMounted(() => {
-//   getVideoUrl()
-//   isVideo.value = false
-//   isForm.value = false
-//   isFormlist.value = false
-//   getMessageList()
-// })
 
 const formatDateTime = dateTimeString => {
   const dateObject = new Date(dateTimeString)
@@ -180,7 +195,7 @@ const hideModal = e => {
   modalName.value = null
 }
 
-const onConfirm = e => {
+const onConfirm = async () => {
   if (nickname.value === null || nickname.value === '') {
     showToast('请选择或输入昵称~')
     return
@@ -191,28 +206,23 @@ const onConfirm = e => {
   }
   modalName.value = null
 
-  const openId = instance.appContext.config.globalProperties.$MpUserData.openId
-
-  uploadAvatar(avatarUrl.value, {
-    openId: openId
-  }).then(res => {
-    addOrUpdateUser({
-      openid: openId,
-      user: {
-        nickName: nickname.value,
-        avatarUrl: res.data
-      }
-    }).then(res => {
-      isOpen.value = true
-      getUserByOpenId(openId).then(res => {
-        if (res?.data?.length > 0) {
-          instance.appContext.config.globalProperties.$MpUserData = {
-            openId,
-            ...res.data[0]
-          }
-        }
-      })
+  if (!openId.value) {
+    const userRes = await wx.cloud.callFunction({
+      name: 'user',
+      data: {}
     })
+    console.log('userRes:', userRes)
+    openId.value = (userRes.result as AnyObject).openid
+  }
+
+  const fileRes = await wx.cloud.uploadFile({
+    cloudPath: `${openId.value}.jpg`, // 上传至云端的路径
+    filePath: avatarUrl.value // 小程序临时文件路径
+  })
+  console.log('fileRes:', fileRes)
+  addUser({
+    nickName: nickname.value,
+    avatarUrl: fileRes.fileID
   })
 }
 
@@ -249,11 +259,21 @@ const copy = item => {
   }
 }
 
-const toMessage = e => {
-  if (instance.appContext.config.globalProperties.$MpUserData?.user) {
+const toMessage = async () => {
+  if (userInfo.value) {
     isOpen.value = true
   } else {
-    modalName.value = 'Modal'
+    const res = await wx.cloud.callFunction({
+      name: 'isUserGreeted'
+    })
+    console.log(res)
+    const userData = (res.result as AnyObject).data
+    userInfo.value = userData
+    if (userData) {
+      isOpen.value = true
+    } else {
+      modalName.value = 'Modal'
+    }
   }
 }
 
@@ -312,7 +332,7 @@ const deleteMessage = item => {
               .callFunction({
                 name: 'message',
                 data: {
-                  id: item.id
+                  id: item._id
                 }
               })
               .then(res => {
@@ -353,11 +373,11 @@ const getNowFormatDate = () => {
   const hh = now.getHours()
   const mm = now.getMinutes()
   const ss = now.getSeconds()
-  let clock = year + '-'
+  let clock = year + '/'
   if (month < 10) {
     clock += '0'
   }
-  clock += month + '-'
+  clock += month + '/'
   if (day < 10) {
     clock += '0'
   }
@@ -394,47 +414,21 @@ const getMessageList = () => {
   }
 }
 
-const toForm = e => {
-  // if (e.target.errMsg === 'getUserInfo:ok') {
-  //   wx.getUserInfo({
-  //     success: function (res: any) {
-  //       userInfo.value = res.userInfo
-  //       getOpenId(res.code, 'present')
-  //     }
-  //   })
-  // }
-
-  if (instance.appContext.config.globalProperties.$MpUserData?.user) {
-    getIsPresentExist()
-  } else {
-    modalName.value = 'Modal'
-  }
+const toForm = async () => {
+  getIsPresentExist()
 }
 
 const closeForm = () => {
   isForm.value = false
 }
 
-const addUser = () => {
-  const db = wx.cloud.database()
-  const user = db.collection('user')
-  user
-    .add({
-      data: {
-        user: userInfo.value
-      }
-    })
-    .then(res => {
-      // console.log(res)
-    })
-}
 const getIsPresentExist = () => {
   if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
     const db = wx.cloud.database()
     const present = db.collection('present')
     present
       .where({
-        openid: openId.value
+        _openid: openId.value
       })
       .get()
       .then(res => {
@@ -442,7 +436,7 @@ const getIsPresentExist = () => {
           dataFlag: false,
           id: ''
         }
-        if (res.data.length !== 0) {
+        if (res.data?.length !== 0) {
           formData.name = res.data[0].name
           formData.phone = res.data[0].phone
           formData.count = res.data[0].count
@@ -475,18 +469,18 @@ const getIsPresentExist = () => {
   }
 }
 
-const getIsExist = () => {
+const addUser = userInfo => {
   const db = wx.cloud.database()
   const user = db.collection('user')
   user
-    .where({
-      openid: openId.value
-    })
-    .get()
-    .then(res => {
-      if (res.data.length === 0) {
-        addUser()
+    .add({
+      data: {
+        ...userInfo
       }
+    })
+    .then(res => {
+      showToast('祝福成功~')
+      isOpen.value = true
     })
 }
 
@@ -523,16 +517,7 @@ const getFromlist = () => {
         data: {}
       })
       .then(res => {
-        formList.value = (res.result as AnyObject).data.reverse().map(x => {
-          return {
-            count: x.count,
-            desc: x.desc,
-            name: x.name,
-            phone: isAdmin.value ? x.phone : x.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'),
-            id: x.id,
-            openid: x.openid
-          }
-        })
+        formList.value = (res.result as AnyObject).data.reverse()
       })
   } else {
     getPresentList().then(res => {

@@ -1,8 +1,8 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-12 21:49:06
- * @LastEditTime: 2023-08-20 00:48:17
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditTime: 2024-06-02 09:31:26
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\src\App.vue
 -->
@@ -21,29 +21,29 @@ onHide(() => {
   console.log('App Hide')
 })
 
-uni.login({
-  provider: 'weixin',
-  success: res => {
-    code2Session(res.code).then(res => {
-      const openId = res.data.openid
-      instance.appContext.config.globalProperties.$MpUserData = {
-        openId
-      }
+// uni.login({
+//   provider: 'weixin',
+//   success: res => {
+//     code2Session(res.code).then(res => {
+//       const openId = res.data.openid
+//       instance.appContext.config.globalProperties.$MpUserData = {
+//         openId
+//       }
 
-      getUserByOpenId(openId).then(res => {
-        if (res?.data?.length > 0) {
-          instance.appContext.config.globalProperties.$MpUserData = {
-            openId,
-            ...res.data[0]
-          }
-        }
-      })
-    })
-  },
-  fail: err => {
-    console.log('login fail:', err)
-  }
-})
+//       getUserByOpenId(openId).then(res => {
+//         if (res?.data?.length > 0) {
+//           instance.appContext.config.globalProperties.$MpUserData = {
+//             openId,
+//             ...res.data[0]
+//           }
+//         }
+//       })
+//     })
+//   },
+//   fail: err => {
+//     console.log('login fail:', err)
+//   }
+// })
 
 const instance = getCurrentInstance()
 uni.getSystemInfo({

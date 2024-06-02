@@ -1,8 +1,8 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:40:59
  * @LastEditTime: 2023-08-29 10:44:03
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditors: zephor5 370681295@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\src\component\index-swiper.vue
 -->

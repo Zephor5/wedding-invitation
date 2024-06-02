@@ -1,18 +1,18 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-12 21:49:06
- * @LastEditTime: 2023-08-23 09:46:11
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditTime: 2024-06-02 09:57:48
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation-me\src\pages\index\index.vue
 -->
 <template>
   <div class="index">
-    <image class="bg-image" :src="background" />
+    <image class="bg-image" :src="background" mode="aspectFill" />
     <div class="bg-swiper">
       <index-swiper :list="list" :info="info" :autoplay="autoplay"></index-swiper>
     </div>
-    <div v-if="videoUrl !== '' && videoUrl !== undefined && videoUrl !== null">
+    <div>
       <div class="bg_music" v-if="isPlaying" @tap="audioPlay">
         <image src="../../static/images/music_icon.png" class="musicImg music_icon" />
         <image src="../../static/images/music_play.png" class="music_play pauseImg" />
@@ -55,16 +55,13 @@ onLoad(() => {
     common.get().then(res => {
       background.value = res.data[0].background
       info.value = res.data[0].info
+      videoUrl.value = res.data[0].videoUrl
     })
   } else {
     getCommonConfig().then(res => {
       background.value = res.data.background
       info.value = res.data.info
       videoUrl.value = res.data.videoUrl
-
-      if (videoUrl.value) {
-        innerAudioContext.src = globalData.musicList[0].url
-      }
     })
   }
 
@@ -72,7 +69,7 @@ onLoad(() => {
 })
 
 onShow(() => {
-  autoplay.value = true
+  // autoplay.value = true
 })
 
 onHide(() => {
@@ -109,9 +106,9 @@ const getBannerList = () => {
     banner.get().then(res => {
       let result = []
       let animations = ['fadeInLeft', 'slideInDown', 'rotateInDownRight', 'rollIn', 'jackInTheBox', 'flip']
-      for (let i = 0; i < res.data[0].bannerList.length; i++) {
+      for (let i = 0; i < res.data.length; i++) {
         result.push({
-          url: res.data[0].bannerList[i].url,
+          url: res.data[i].url,
           show: i === 0,
           class: animations[i]
         })
@@ -122,9 +119,9 @@ const getBannerList = () => {
     getResouces('index-banner').then(res => {
       let result = []
       let animations = ['fadeInLeft', 'slideInDown', 'rotateInDownRight', 'rollIn', 'jackInTheBox', 'flip']
-      for (let i = 0; i < res.data.length; i++) {
+      for (let i = 0; i < res.data.bannerList.length; i++) {
         result.push({
-          url: res.data[i].url,
+          url: res.data.bannerList[i].url,
           show: i === 0,
           class: animations[i]
         })

@@ -1,8 +1,8 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:21:48
- * @LastEditTime: 2023-01-30 00:26:35
- * @LastEditors: zouyaoji
+ * @LastEditTime: 2024-06-02 17:54:29
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\src\pages\map\index.vue
 -->
@@ -19,6 +19,7 @@
       @markertap="toNav"
     >
     </map>
+    <view class="description">您可以点击地图上的图标打开导航<br />宴席为也您准备有地下地上停车场，可免费停车5小时</view>
     <div class="call">
       <div class="left" @tap="linkHe">
         <image src="../../static/images/he.png" />
@@ -42,12 +43,12 @@ const markers = ref([
     id: 0,
     width: 50,
     height: 50,
-    latitude: '30',
-    longitude: '104'
+    latitude: '30.537856',
+    longitude: '114.247527'
   }
 ])
 
-const heNumber = ref('')
+const heNumber = ref('13375372201')
 const sheNumber = ref('')
 
 onMounted(() => {
@@ -131,6 +132,11 @@ const linkShe = () => {
         color: #6b4f4e;
       }
     }
+  }
+  .description {
+    color: #717171;
+    padding: 20rpx 48rpx 48rpx;
+    font-size: 30rpx;
   }
   .footer {
     height: 80rpx;

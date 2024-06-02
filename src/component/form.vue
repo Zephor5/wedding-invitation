@@ -1,8 +1,8 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-14 10:26:22
- * @LastEditTime: 2023-08-22 15:30:20
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditTime: 2024-06-02 17:43:27
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation-me\src\component\form.vue
 -->
@@ -12,7 +12,13 @@
     <p class="title"><span>* </span>姓名</p>
     <input type="text" placeholder="怎么称呼您呢？" v-model="name" maxlength="20" />
     <p class="title"><span>* </span>电话</p>
-    <input type="number" placeholder="请填写有效的手机号码" v-model="phone" @input="checkPhone" maxlength="11" />
+    <input
+      type="number"
+      placeholder="请填写手机号码（其他人不会看到您的号码）"
+      v-model="phone"
+      @input="checkPhone"
+      maxlength="11"
+    />
     <p class="title">几人出席</p>
     <radio-group @change="radioChange" class="group">
       <label class="radio" v-for="(item, index) in list" :key="index">
@@ -57,14 +63,13 @@ const list = ref([
 ])
 const desc = ref('')
 const name = ref('')
-const phone = ref('asdasd')
+const phone = ref('')
 const count = ref('自己出席')
 const phoneFlag = ref(false)
 const _id = ref('')
 
 const instance = getCurrentInstance()
 const $emit = defineEmits(['closeForm'])
-const openId = instance.appContext.config.globalProperties.$MpUserData?.openId
 
 const cancel = () => {
   $emit('closeForm')
@@ -148,8 +153,7 @@ const addPresent = () => {
       name: name.value,
       phone: phone.value,
       count: count.value,
-      desc: desc.value,
-      openid: openId
+      desc: desc.value
     }).then(res => {
       name.value = ''
       phone.value = ''

@@ -1,8 +1,8 @@
 /*
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-12 21:59:51
- * @LastEditTime: 2022-04-28 15:57:23
- * @LastEditors: zouyaoji
+ * @LastEditTime: 2024-06-02 13:45:12
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\src\static\functions\messageList\index.js
  */
@@ -14,6 +14,12 @@ exports.main = async (event, context) => {
   // 先取出集合记录总数
   const countResult = await db.collection('message').count()
   const total = countResult.total
+  if (!total) {
+    return {
+      data: [],
+      errMsg: 'ok'
+    }
+  }
   // 计算需分几次取
   const batchTimes = Math.ceil(total / 100)
   // 承载所有读操作的 promise 的数组

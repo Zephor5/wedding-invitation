@@ -1,8 +1,8 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2020-12-12 16:15:26
  * @LastEditTime: 2023-09-26 17:44:51
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditors: zephor5 370681295@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\README.md
 -->
@@ -49,8 +49,8 @@ pnpm dev:mp-weixin
 - 微信 / 支付宝
 
   <div style="display: flex">
-    <img alt="wechat" title="wechat" src="https://zouyaoji.top/vue-cesium/images/wechat.png">
-    <img alt="alipay" title="alipay" src="https://zouyaoji.top/vue-cesium/images/alipay.png">
+    <img alt="wechat" title="wechat" src="https://zephor5.top/vue-cesium/images/wechat.png">
+    <img alt="alipay" title="alipay" src="https://zephor5.top/vue-cesium/images/alipay.png">
   </div>
 
 ## 其他

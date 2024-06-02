@@ -1,23 +1,24 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:21:48
- * @LastEditTime: 2023-08-24 15:32:50
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditTime: 2024-06-02 13:56:28
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation-me\src\pages\greet\index.vue
 -->
 <template>
   <div class="greet">
     <image class="head" src="../../static/images/heart-animation.gif" />
-    <scroll-view scroll-y class="image-box">
-      <div class="image-item" v-for="(item, index) in userList" :key="index">
-        <view
+    <scroll-view scroll-y class="image-box" enable-flex>
+      <div class="image-item" v-for="(user, index) in userList" :key="index">
+        <!-- <view
           class="cu-avatar round lg"
           :style="{
-            'background-image': `url(${item.user.avatarUrl})`
+            'background-image': `url(${user.avatarUrl})`
           }"
-        ></view>
-        <p>{{ item.user.nickName }}</p>
+        ></view> -->
+        <image class="cu-avatar round lg" :src="user.avatarUrl" />
+        <p>{{ user.nickName }}</p>
       </div>
     </scroll-view>
     <p class="count">已收到{{ userList.length }}位好友送来的祝福</p>
@@ -27,7 +28,7 @@
     </div>
   </div>
 
-  <view class="cu-modal" :class="modalName === 'Modal' ? 'show' : ''">
+  <view class="cu-modal" :class="showModal ? 'show' : ''">
     <view class="cu-dialog">
       <view class="cu-bar bg-white justify-end">
         <view class="content">怎么称呼您？</view>
@@ -41,12 +42,7 @@
             <view class="title">头像</view>
 
             <button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
-              <view
-                class="cu-avatar round lg"
-                :style="{
-                  'background-image': `url(${avatarUrl})`
-                }"
-              ></view>
+              <image class="cu-avatar round lg" :src="avatarUrl || avatarHolder" />
             </button>
           </view>
           <view class="cu-form-group margin-top">
@@ -67,21 +63,17 @@
 
 <script lang="ts" setup>
 import { onShow } from '@dcloudio/uni-app'
-import {
-  addOrUpdateUser,
-  code2Session,
-  getFriendUserList,
-  getUserByOpenId,
-  uploadAvatar
-} from '@src/api/wedding-invitation'
+import { GlobalData } from '@src/types'
 import { showToast } from '@src/utils'
 import { getCurrentInstance, onMounted, ref } from 'vue'
 
+const greeted = ref(false)
 const userList = ref([])
-const userInfo = ref(null)
 const instance = getCurrentInstance()
-const modalName = ref(null)
-const avatarUrl = ref(null)
+const globalData: GlobalData = instance.appContext.config.globalProperties.globalData
+const showModal = ref(false)
+const avatarHolder = ref('cloud://wedding-3g05k4yzd513e5bb.7765-wedding-3g05k4yzd513e5bb-1258796497/avatar.svg')
+const avatarUrl = ref('')
 const nickname = ref(null)
 
 // onMounted(() => {
@@ -90,6 +82,7 @@ const nickname = ref(null)
 
 onShow(() => {
   getUserList()
+  isUserGreeted()
 })
 
 const onInput = e => {
@@ -97,96 +90,100 @@ const onInput = e => {
 }
 
 const hideModal = e => {
-  modalName.value = null
+  showModal.value = false
 }
 
-const onConfirm = e => {
-  if (nickname.value === null || nickname.value === '') {
+const onConfirm = async () => {
+  if (!nickname.value) {
     showToast('请选择或输入昵称~')
     return
   }
 
-  if (avatarUrl.value === null || avatarUrl.value === '') {
+  if (!avatarUrl.value) {
     showToast('请选择或上传头像~')
     return
   }
-  modalName.value = null
+  showModal.value = false
 
-  const openId = instance.appContext.config.globalProperties.$MpUserData.openId
-  uploadAvatar(avatarUrl.value, {
-    openId
-  }).then(res => {
-    addOrUpdateUser({
-      openid: openId,
-      user: {
-        nickName: nickname.value,
-        avatarUrl: res.data
-      }
-    }).then(res => {
-      showToast('祝福成功~')
-      getUserList()
-      getUserByOpenId(openId).then(res => {
-        if (res?.data?.length > 0) {
-          instance.appContext.config.globalProperties.$MpUserData = {
-            openId,
-            ...res.data[0]
-          }
-        }
-      })
+  if (!globalData.openid) {
+    const userRes = await wx.cloud.callFunction({
+      name: 'user',
+      data: {}
     })
+    console.log('userRes:', userRes)
+    globalData.openid = (userRes.result as AnyObject).openid
+  }
+  const openid = globalData.openid
+
+  const fileRes = await wx.cloud.uploadFile({
+    cloudPath: `${openid}.jpg`, // 上传至云端的路径
+    filePath: avatarUrl.value // 小程序临时文件路径
+  })
+  console.log('fileRes:', fileRes)
+  addUser({
+    nickName: nickname.value,
+    avatarUrl: fileRes.fileID
   })
 }
 
 const sendGreet = e => {
+  console.log(e)
   // if (e.target.errMsg === 'getUserInfo:ok') {
-  //   wx.getUserInfo({
-  //     success: function (res: any) {
-  //       userInfo.value = res.userInfo
-  //       getOpenId(jsCodeMP.value)
-  //     }
-  //   })
+  //   avatarUrl.value = e.detail.userInfo.avatarUrl
+  //   userInfo.value = e.detail.userInfo
   // }
-
-  if (instance.appContext.config.globalProperties.$MpUserData?.user) {
+  if (greeted.value) {
     showToast('您已经送过祝福了~')
   } else {
-    addUser()
+    avatarHolder.value = e.detail.userInfo.avatarUrl
+    showModal.value = true
   }
 }
 
-const addUser = () => {
+const addUser = userInfo => {
   if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
     const db = wx.cloud.database()
     const user = db.collection('user')
     user
       .add({
         data: {
-          user: userInfo.value
+          ...userInfo
         }
       })
       .then(res => {
         showToast('祝福成功~')
+        greeted.value = true
         getUserList()
       })
   } else {
-    modalName.value = 'Modal'
+    showModal.value = true
   }
 }
 
 const getUserList = () => {
-  if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
-    wx.cloud
-      .callFunction({
-        name: 'userList',
-        data: {}
-      })
-      .then(res => {
-        userList.value = (res.result as AnyObject).data.reverse()
-      })
-  } else {
-    getFriendUserList().then(res => {
-      userList.value = res.data.reverse()
+  wx.cloud
+    .callFunction({
+      name: 'userList',
+      data: {}
     })
+    .then(res => {
+      console.log(res)
+      userList.value = (res.result as AnyObject).data || []
+    })
+}
+
+const isUserGreeted = async () => {
+  if (!globalData.userInfo) {
+    const res = await wx.cloud.callFunction({
+      name: 'isUserGreeted'
+    })
+    console.log(res)
+    const userData = (res.result as AnyObject).data
+    greeted.value = !!userData
+    globalData.userInfo = userData
+    if (greeted.value) {
+      globalData.openid = userData.openid
+    }
   }
 }
 
@@ -226,8 +223,6 @@ const onChooseAvatar = e => {
       padding: 25rpx;
       float: left;
       image {
-        width: 180rpx;
-        height: 180rpx;
         border-radius: 90rpx;
       }
       p {

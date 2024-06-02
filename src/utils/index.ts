@@ -1,8 +1,8 @@
 /*
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:49:15
  * @LastEditTime: 2022-04-13 11:24:44
- * @LastEditors: zouyaoji
+ * @LastEditors: zephor5
  * @Description:
  * @FilePath: \wedding-invitation\src\utils\index.ts
  */

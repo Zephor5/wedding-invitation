@@ -1,8 +1,8 @@
 /*
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2021-08-26 17:00:08
  * @LastEditTime: 2022-01-05 22:15:08
- * @LastEditors: zouyaoji
+ * @LastEditors: zephor5
  * @Description:
  * @FilePath: \vue-cesium-demo\.eslintrc.js
  */

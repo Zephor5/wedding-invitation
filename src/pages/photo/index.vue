@@ -1,14 +1,14 @@
 <!--
- * @Author: zouyaoji@https://github.com/zouyaoji
+ * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:29:23
- * @LastEditTime: 2023-08-19 23:40:38
- * @LastEditors: zouyaoji 370681295@qq.com
+ * @LastEditTime: 2024-06-02 17:50:37
+ * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\src\pages\photo\index.vue
 -->
 <template>
   <div class="photo">
-    <image class="bg-image" :src="background" />
+    <image class="bg-image" :src="background" mode="aspectFill" />
     <h-swiper :list="list" :isGif="isGif" :autoplay="autoplay"></h-swiper>
   </div>
 </template>
@@ -51,25 +51,26 @@ onHide(() => {
 const getList = () => {
   if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
     const db = wx.cloud.database()
-    const banner = db.collection('indexBanner')
+    const banner = db.collection('pics')
     banner.get().then(res => {
-      let result = []
-      for (let i = 0; i < res.data[0].bannerList.length; i++) {
-        let show = i === 0
-        result.push({
-          url: res.data[0].bannerList[i].url,
-          show: show
-        })
-      }
-      list.value = result
-    })
-  } else {
-    getResouces('photo-banner').then(res => {
       let result = []
       for (let i = 0; i < res.data.length; i++) {
         let show = i === 0
         result.push({
           url: res.data[i].url,
+          show: show,
+          no: res.data[i].no || i
+        })
+      }
+      list.value = result.sort((a, b) => a.no - b.no)
+    })
+  } else {
+    getResouces('photo-banner').then(res => {
+      let result = []
+      for (let i = 0; i < res.data.bannerList.length; i++) {
+        let show = i === 0
+        result.push({
+          url: res.data.bannerList[i].url,
           show: show
         })
       }

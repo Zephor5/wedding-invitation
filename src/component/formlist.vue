@@ -1,7 +1,7 @@
 <template>
   <div>
     <scroll-view class="formlist" scroll-y>
-      <li class="item" v-for="(item, index) in formList" :key="index">
+      <li v-if="formList?.length" class="item" v-for="item in formList" :key="item.id">
         <div class="item-top">
           <span class="left">{{ item.name }}</span>
           <span class="right">{{ item.phone }}</span>
@@ -13,8 +13,9 @@
           </p>
         </div>
       </li>
+      <view class="notice" v-else>还没有人填写出席记录哦T.T</view>
     </scroll-view>
-    <image src="../../static/images/close1.png" @tap="close" />
+    <image class="close-img" src="../../static/images/close1.png" @tap="close" />
   </div>
 </template>
 
@@ -129,7 +130,7 @@ const close = () => {
     }
   }
 }
-image {
+.close-img {
   width: 80rpx;
   height: 80rpx;
   margin: 0 auto;
@@ -137,5 +138,11 @@ image {
   bottom: 100rpx;
   left: 50%;
   margin-left: -40rpx;
+}
+.notice {
+  background-color: white;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  font-size: 26rpx;
 }
 </style>
