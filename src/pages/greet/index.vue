@@ -81,6 +81,7 @@ const nickname = ref(null)
 // })
 
 onShow(() => {
+  console.log('greet onShow')
   getUserList()
   isUserGreeted()
 })
@@ -184,6 +185,8 @@ const isUserGreeted = async () => {
     if (greeted.value) {
       globalData.openid = userData.openid
     }
+  } else {
+    greeted.value = true
   }
 }
 

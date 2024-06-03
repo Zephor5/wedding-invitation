@@ -14,6 +14,7 @@ export type GlobalData = {
     nickName: string
     avatarUrl: string
   }
+  referrerInfo: AnyObject
   innerAudioContext: WechatMiniprogram.InnerAudioContext
   musicList: Array<{
     id: string
@@ -64,6 +65,6 @@ export type GlobalData = {
     | `slideInLeft`
     | `slideInRight`
     | `slideInUp`
-    // | `heartBeat`
+  // | `heartBeat`
   >
 }

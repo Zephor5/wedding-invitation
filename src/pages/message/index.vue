@@ -470,18 +470,22 @@ const getIsPresentExist = () => {
   }
 }
 
-const addUser = userInfo => {
+const addUser = u => {
   const db = wx.cloud.database()
   const user = db.collection('user')
   user
     .add({
       data: {
-        ...userInfo
+        ...u
       }
     })
-    .then(res => {
-      showToast('祝福成功~')
-      isOpen.value = true
+    .then(async () => {
+      const gRes = await wx.cloud.callFunction({
+        name: 'isUserGreeted'
+      })
+      const userData = (gRes.result as AnyObject).data
+      userInfo.value = userData
+      nextTick(() => { isOpen.value = true })
     })
 }
 

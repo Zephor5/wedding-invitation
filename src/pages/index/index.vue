@@ -12,6 +12,9 @@
     <div class="bg-swiper">
       <index-swiper :list="list" :info="info" :autoplay="autoplay"></index-swiper>
     </div>
+    <div v-if="singlePage" class="single-page">
+      <button class="single-page-btn" open-type="getUserInfo">👆点这儿撒花❀❀❀🎇🎇🎇</button>
+    </div>
     <div>
       <div class="bg_music" v-if="isPlaying" @tap="audioPlay">
         <image src="../../static/images/music_icon.png" class="musicImg music_icon" />
@@ -37,6 +40,7 @@ const isPlaying = ref(false)
 const list = ref([])
 const info = ref({})
 const autoplay = ref(false)
+const singlePage = ref(false)
 
 const instance = getCurrentInstance()
 const globalData: GlobalData = instance.appContext.config.globalProperties.globalData
@@ -70,6 +74,9 @@ onLoad(() => {
 
 onShow(() => {
   // autoplay.value = true
+  const opts = wx.getLaunchOptionsSync()
+  console.log('onShow', opts)
+  singlePage.value = opts?.scene === 1154
 })
 
 onHide(() => {
@@ -340,6 +347,15 @@ onShareTimeline(() => {
     width: 572rpx;
     height: 69rpx;
     z-index: 9;
+  }
+  .single-page {
+    position: fixed;
+    left: 26%;
+    bottom: 10rpx;
+    .single-page-btn {
+      border-radius: 20rpx;
+      font-size: 26rpx;
+    }
   }
   .bg_music {
     position: fixed;

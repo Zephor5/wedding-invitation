@@ -9,13 +9,17 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
 import { getCurrentInstance, onMounted } from 'vue'
-import { code2Session, getUserByOpenId } from './api/wedding-invitation'
+import { GlobalData } from './types';
+
+const instance = getCurrentInstance()
+const globalData: GlobalData = instance.appContext.config.globalProperties.globalData
 
 onLaunch(() => {
   console.log('App Launch')
 })
-onShow(() => {
-  console.log('App Show')
+onShow((opts) => {
+  console.log('App Show', opts)
+  globalData.referrerInfo = opts.referrerInfo
 })
 onHide(() => {
   console.log('App Hide')
@@ -45,7 +49,6 @@ onHide(() => {
 //   }
 // })
 
-const instance = getCurrentInstance()
 uni.getSystemInfo({
   success: function (e) {
     instance.appContext.config.globalProperties.$StatusBar = e.statusBarHeight
