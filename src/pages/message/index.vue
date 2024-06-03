@@ -55,7 +55,7 @@
       <h-form ref="formRef" @closeForm="closeForm" @getFromlist="getFromlist"></h-form>
     </div>
     <div class="form-list" v-show="isFormlist">
-      <h-formlist @closeFormlist="closeFormlist" :formList="formList"></h-formlist>
+      <h-formlist :formList="formList" :loading="formListLoading" @closeFormlist="closeFormlist"></h-formlist>
     </div>
   </div>
 
@@ -119,6 +119,7 @@ const isForm = ref(false)
 const isVideo = ref(false)
 const isFormlist = ref(false)
 const formList = ref([])
+const formListLoading = ref(false)
 const url = ref('')
 const poster = ref('')
 const adminsIds = ref([])
@@ -510,29 +511,17 @@ const closeFormlist = () => {
 }
 
 const getFromlist = () => {
-  if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
-    wx.cloud
-      .callFunction({
-        name: 'presentList',
-        data: {}
-      })
-      .then(res => {
-        formList.value = (res.result as AnyObject).data.reverse()
-      })
-  } else {
-    getPresentList().then(res => {
-      formList.value = res.data.reverse().map(x => {
-        return {
-          count: x.count,
-          desc: x.desc,
-          name: x.name,
-          phone: isAdmin.value ? x.phone : x.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'),
-          id: x.id,
-          openid: x.openid
-        }
-      })
+  formListLoading.value = true
+  wx.cloud
+    .callFunction({
+      name: 'presentList',
+      data: {}
     })
-  }
+    .then(res => {
+      formList.value = (res.result as AnyObject).data.reverse()
+    }).finally(() => {
+      formListLoading.value = false
+    })
 }
 </script>
 

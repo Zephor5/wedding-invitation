@@ -19,7 +19,7 @@
       @markertap="toNav"
     >
     </map>
-    <view class="description">您可以点击地图上的图标打开导航<br />宴席为也您准备有地下地上停车场，可免费停车5小时</view>
+    <view class="description">您可以点击地图上的图标打开导航<br />宴席也为您准备有地下地上停车场，可免费停车5小时</view>
     <div class="call">
       <div class="left" @tap="linkHe">
         <image src="../../static/images/he.png" />

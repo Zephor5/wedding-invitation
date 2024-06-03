@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
 import { GlobalData } from '@src/types'
 import { showToast } from '@src/utils'
 import { getCurrentInstance, onMounted, ref } from 'vue'
@@ -190,6 +190,13 @@ const isUserGreeted = async () => {
 const onChooseAvatar = e => {
   avatarUrl.value = e.detail.avatarUrl
 }
+
+onShareAppMessage(() => {
+  return {
+    title: 'WZH&LQ的婚礼邀请',
+    path: '/pages/index/index'
+  }
+})
 </script>
 
 <style lang="scss" scoped>

@@ -30,7 +30,7 @@ exports.main = async (event, context) => {
     errMsg: acc.errMsg
   }))
   res.data.forEach(item => {
-    item.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+    item.phone = item.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
   })
   return res
 }

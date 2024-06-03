@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import HSwiper from '@src/component/swiper.vue'
-import { onHide, onShow } from '@dcloudio/uni-app'
+import { onHide, onShareAppMessage, onShow } from '@dcloudio/uni-app'
 import { getResouces, getCommonConfig } from '@src/api/wedding-invitation'
 
 const list = ref([])
@@ -78,6 +78,10 @@ const getList = () => {
     })
   }
 }
+
+onShareAppMessage(() => ({
+  title: 'WZH&LQ的婚礼邀请'
+}))
 </script>
 
 <style lang="scss" scoped>

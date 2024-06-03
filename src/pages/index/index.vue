@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue'
 import IndexSwiper from '@src/component/index-swiper.vue'
-import { onHide, onLoad, onShareAppMessage, onShow, onUnload } from '@dcloudio/uni-app'
+import { onHide, onLoad, onShareAppMessage, onShareTimeline, onShow, onUnload } from '@dcloudio/uni-app'
 import { GlobalData } from '@src/types'
 import { showToast } from '@src/utils'
 import { getCommonConfig, getResouces } from '@src/api/wedding-invitation'
@@ -133,7 +133,15 @@ const getBannerList = () => {
 
 onShareAppMessage(() => {
   return {
-    path: '/pages/index/index'
+    title: 'WZH&LQ的婚礼邀请',
+    path: '/pages/index/index',
+    imageUrl: '../../static/images/share-5.4.jpg'
+  }
+})
+onShareTimeline(() => {
+  return {
+    title: 'WZH&LQ的婚礼邀请',
+    imageUrl: '../../static/images/share-5.4.jpg'
   }
 })
 </script>

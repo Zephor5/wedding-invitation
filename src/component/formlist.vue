@@ -13,7 +13,7 @@
           </p>
         </div>
       </li>
-      <view class="notice" v-else>还没有人填写出席记录哦T.T</view>
+      <view class="notice" v-else>{{ loading ? '正在为您加载...' : '还没有人填写出席记录哦T.T' }}</view>
     </scroll-view>
     <image class="close-img" src="../../static/images/close1.png" @tap="close" />
   </div>
@@ -23,7 +23,8 @@
 import { PropType } from 'vue'
 
 defineProps({
-  formList: Array as PropType<any>
+  formList: Array as PropType<any>,
+  loading: Boolean
 })
 
 const $emit = defineEmits(['closeFormlist'])
