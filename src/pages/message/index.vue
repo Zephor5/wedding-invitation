@@ -31,7 +31,7 @@
       </div>
       <p class="place-end"></p>
     </scroll-view>
-    <div class="bottom" v-if="openId">
+    <div class="bottom" v-if="msgEnable && openId">
       <button class="left" lang="zh_CN" open-type="getUserInfo" @getuserinfo="toMessage">说点啥吧</button>
       <button class="right" open-type="getUserInfo" @getuserinfo="toForm">我要出席</button>
     </div>
@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, getCurrentInstance, nextTick, watch } from 'vue'
+import { ref, computed, getCurrentInstance, nextTick, watch } from 'vue'
 import HVideo from '@src/component/video.vue'
 import HForm from '@src/component/form.vue'
 import HFormlist from '@src/component/formlist.vue'
@@ -102,12 +102,8 @@ import { GlobalData } from '@src/types'
 import UniTag from '@src/component/uni-tag.vue'
 import {
   addMessage,
-  addOrUpdateUser,
   getAllMessageList,
-  getCommonConfig,
   getPresentList,
-  getUserByOpenId,
-  uploadAvatar,
   deleteMessage as deleteMessageApi
 } from '@src/api/wedding-invitation'
 import { onShow } from '@dcloudio/uni-app'
@@ -126,6 +122,7 @@ const adminsIds = ref([])
 const musicPlay = ref(false)
 const nickname = ref('')
 const formRef = ref(null)
+const msgEnable = ref(false)
 
 const modalName = ref(null)
 const instance = getCurrentInstance()
@@ -232,21 +229,15 @@ const onChooseAvatar = e => {
 }
 
 const getVideoUrl = () => {
-  if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
-    const db = wx.cloud.database()
-    const common = db.collection('common')
-    common.get().then(res => {
-      url.value = res.data[0].videoUrl
-      poster.value = res.data[0].poster
-      adminsIds.value = res.data[0].adminOpenIds
-    })
-  } else {
-    getCommonConfig().then(res => {
-      url.value = res.data.videoUrl
-      poster.value = res.data.poster
-      adminsIds.value = res.data.adminOpenIds
-    })
-  }
+  const db = wx.cloud.database()
+  const common = db.collection('common')
+  common.get().then(res => {
+    const data = res.data[0]
+    url.value = data.videoUrl
+    poster.value = data.poster
+    adminsIds.value = data.adminOpenIds
+    msgEnable.value = data.msgEnable
+  })
 }
 
 const copy = item => {
