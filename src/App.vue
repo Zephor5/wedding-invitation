@@ -1,7 +1,7 @@
 <!--
  * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-12 21:49:06
- * @LastEditTime: 2024-06-02 09:31:26
+ * @LastEditTime: 2024-06-04 12:50:55
  * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\src\App.vue
@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
 import { getCurrentInstance, onMounted } from 'vue'
-import { GlobalData } from './types';
+import { GlobalData } from './types'
 
 const instance = getCurrentInstance()
 const globalData: GlobalData = instance.appContext.config.globalProperties.globalData
@@ -17,9 +17,8 @@ const globalData: GlobalData = instance.appContext.config.globalProperties.globa
 onLaunch(() => {
   console.log('App Launch')
 })
-onShow((opts) => {
+onShow(opts => {
   console.log('App Show', opts)
-  globalData.referrerInfo = opts.referrerInfo
 })
 onHide(() => {
   console.log('App Hide')

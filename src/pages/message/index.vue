@@ -1,7 +1,7 @@
 <!--
  * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:29:22
- * @LastEditTime: 2024-06-02 17:23:12
+ * @LastEditTime: 2024-06-04 13:33:52
  * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation-me\src\pages\message\index.vue
@@ -10,7 +10,7 @@
   <div class="message">
     <scroll-view scroll-y class="box">
       <p class="place"></p>
-      <div class="item" v-for="(item, index) in messageList" :key="index">
+      <div class="item" v-for="(item, index) in msgEnable ? messageList : []" :key="index">
         <image class="left" :src="item.url" />
         <div class="right">
           <div class="top">
@@ -35,6 +35,7 @@
       <button class="left" lang="zh_CN" open-type="getUserInfo" @getuserinfo="toMessage">说点啥吧</button>
       <button class="right" open-type="getUserInfo" @getuserinfo="toForm">我要出席</button>
     </div>
+    <div v-else class="bottom">这是一个自制请柬~</div>
     <div class="dialog" v-show="isOpen">
       <textarea class="desc" placeholder="在这里输入您想要说的话" placeholder-style="color:#ccc;" v-model="desc" />
       <div class="btn">
@@ -45,7 +46,7 @@
     <div class="video-dialog" @tap="toVideo" v-if="url">
       <image src="../../static/images/video1.png" />
     </div>
-    <div class="form-dialog" @tap="lookList">
+    <div v-if="msgEnable" class="form-dialog" @tap="lookList">
       <image src="../../static/images/form.png" />
     </div>
     <div class="video" v-if="isVideo">
@@ -237,6 +238,9 @@ const getVideoUrl = () => {
     poster.value = data.poster
     adminsIds.value = data.adminOpenIds
     msgEnable.value = data.msgEnable
+    if (data.msgEnable) {
+      uni.setNavigationBarTitle({ title: '留言评论' })
+    }
   })
 }
 
@@ -390,20 +394,14 @@ const getNowFormatDate = () => {
 }
 
 const getMessageList = () => {
-  if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
-    wx.cloud
-      .callFunction({
-        name: 'messageList',
-        data: {}
-      })
-      .then(res => {
-        messageList.value = (res.result as AnyObject).data.reverse()
-      })
-  } else {
-    getAllMessageList().then(res => {
-      messageList.value = res.data
+  wx.cloud
+    .callFunction({
+      name: 'messageList',
+      data: {}
     })
-  }
+    .then(res => {
+      messageList.value = (res.result as AnyObject).data.reverse()
+    })
 }
 
 const toForm = async () => {
@@ -476,7 +474,9 @@ const addUser = u => {
       })
       const userData = (gRes.result as AnyObject).data
       userInfo.value = userData
-      nextTick(() => { isOpen.value = true })
+      nextTick(() => {
+        isOpen.value = true
+      })
     })
 }
 
@@ -514,7 +514,8 @@ const getFromlist = () => {
     })
     .then(res => {
       formList.value = (res.result as AnyObject).data.reverse()
-    }).finally(() => {
+    })
+    .finally(() => {
       formListLoading.value = false
     })
 }

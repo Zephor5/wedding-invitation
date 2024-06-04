@@ -1,7 +1,7 @@
 /*
  * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-12 21:49:06
- * @LastEditTime: 2024-06-02 09:03:14
+ * @LastEditTime: 2024-06-04 12:50:59
  * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation-me\src\main.ts
@@ -37,6 +37,8 @@ let innerAudioContext = wx.createInnerAudioContext()
 innerAudioContext.autoplay = true
 
 const globalData: GlobalData = {
+  openid: null,
+  userInfo: null,
   innerAudioContext,
   musicList: [],
   musicIndex: 1,

@@ -1,7 +1,7 @@
 /*
  * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-13 09:54:01
- * @LastEditTime: 2024-06-02 16:26:49
+ * @LastEditTime: 2024-06-04 13:27:14
  * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation\src\types\index.ts
@@ -14,7 +14,6 @@ export type GlobalData = {
     nickName: string
     avatarUrl: string
   }
-  referrerInfo: AnyObject
   innerAudioContext: WechatMiniprogram.InnerAudioContext
   musicList: Array<{
     id: string

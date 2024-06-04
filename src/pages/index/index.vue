@@ -1,7 +1,7 @@
 <!--
  * @Author: zephor5@https://github.com/zephor5
  * @Date: 2022-04-12 21:49:06
- * @LastEditTime: 2024-06-02 09:57:48
+ * @LastEditTime: 2024-06-04 13:30:22
  * @LastEditors: Zephor5 zephor@qq.com
  * @Description:
  * @FilePath: \wedding-invitation-me\src\pages\index\index.vue
@@ -29,12 +29,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue'
+import { ref, getCurrentInstance } from 'vue'
 import IndexSwiper from '@src/component/index-swiper.vue'
-import { onHide, onLoad, onShareAppMessage, onShareTimeline, onShow, onUnload } from '@dcloudio/uni-app'
+import { onHide, onLoad, onShareAppMessage, onShareTimeline, onShow } from '@dcloudio/uni-app'
 import { GlobalData } from '@src/types'
 import { showToast } from '@src/utils'
-import { getCommonConfig, getResouces } from '@src/api/wedding-invitation'
+import { getResouces } from '@src/api/wedding-invitation'
 
 const isPlaying = ref(false)
 const list = ref([])
@@ -53,21 +53,23 @@ onLoad(() => {
   innerAudioContext.onPlay(onPlay)
   innerAudioContext.onPause(onPause)
 
-  if (import.meta.env.VITE_VUE_WECHAT_TCB === 'true') {
-    const db = wx.cloud.database()
-    const common = db.collection('common')
-    common.get().then(res => {
-      background.value = res.data[0].background
-      info.value = res.data[0].info
-      videoUrl.value = res.data[0].videoUrl
-    })
-  } else {
-    getCommonConfig().then(res => {
-      background.value = res.data.background
-      info.value = res.data.info
-      videoUrl.value = res.data.videoUrl
-    })
-  }
+  const db = wx.cloud.database()
+  const common = db.collection('common')
+  common.get().then(res => {
+    const data = res.data[0]
+    background.value = data.background
+    info.value = data.info
+    videoUrl.value = data.videoUrl
+    if (data.msgEnable) {
+      uni.setTabBarItem({
+        index: 4,
+        pagePath: '/pages/message/index',
+        iconPath: 'static/images/5-1.png',
+        selectedIconPath: 'static/images/5-2.png',
+        text: '留言评论'
+      })
+    }
+  })
 
   getBannerList()
 })
@@ -379,6 +381,7 @@ onShareTimeline(() => {
       margin-left: -10rpx;
       transform-origin: top;
       -webkit-transform: rotate(20deg);
+      transform: rotate(20deg);
     }
     .playImg {
       animation: musicStop 1s linear forwards;
